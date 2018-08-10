@@ -97,6 +97,7 @@ public class DatasetInstanceHandler extends AbstractHttpHandler {
                   @PathParam("namespace-id") String namespaceId,
                   @PathParam("name") String name,
                   @QueryParam("owner") List<String> owners) throws Exception {
+
     responder.sendJson(HttpResponseStatus.OK,
                        GSON.toJson(instanceService.get(ConversionHelpers.toDatasetInstanceId(namespaceId, name),
                                                        ConversionHelpers.strings2ProgramIds(owners)),
