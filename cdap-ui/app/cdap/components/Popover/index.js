@@ -30,7 +30,7 @@ export default class Popover extends PureComponent {
   static propTypes = {
     children: PropTypes.node,
     target: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-    targetDimension: PropTypes.object.isRequired,
+    targetDimension: PropTypes.object,
     className: PropTypes.string,
     showOn: PropTypes.oneOf(['Click', 'Hover']),
     bubbleEvent: PropTypes.bool,
@@ -145,6 +145,16 @@ export default class Popover extends PureComponent {
       return false;
     }
   }
+  onMouseOverToggle = () => {
+    if (!this.state.showPopover) {
+      this.togglePopover();
+    }
+  }
+  onMouseOutToggle = () => {
+    if (this.state.showPopover) {
+      this.togglePopover();
+    }
+  }
 
   render() {
     let targetProps = {
@@ -153,8 +163,8 @@ export default class Popover extends PureComponent {
     if (this.props.showOn === 'Click') {
       targetProps[`on${this.props.showOn}`] = this.togglePopover;
     } else if (this.props.showOn === 'Hover') {
-      targetProps['onMouseOver'] = this.togglePopover;
-      targetProps['onMouseOut'] = this.togglePopover;
+      targetProps['onMouseOver'] = this.onMouseOverToggle;
+      targetProps['onMouseOut'] = this.onMouseOutToggle;
     }
     const TargetElement = this.props.target;
     return (
