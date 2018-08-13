@@ -19,7 +19,7 @@ function LogViewerController ($scope, $window, LogViewerStore, myLogsApi, LOGVIE
 
   /**
    *  For reference:
-   *  The entry point for this log is startTimeRequest()
+   *  The entry point for this log is @ line 732. #START_POINT #sigh
    **/
 
   // Collapsing LogViewer Table Columns
@@ -579,6 +579,7 @@ function LogViewerController ($scope, $window, LogViewerStore, myLogsApi, LOGVIE
   };
 
   vm.includeEvent = function(event, eventType) {
+    console.log('Entering include event');
     if (eventType === vm.selectedLogLevel) {
       event.preventDefault();
       return;
@@ -615,10 +616,8 @@ function LogViewerController ($scope, $window, LogViewerStore, myLogsApi, LOGVIE
     // Whenever we change the log level filter, the data needs
     // to start from scratch
     vm.data = [];
-    if (vm.startTimeMs) {
-      vm.fromOffset = -10000 + '.' + vm.startTimeMs;
-    }
-
+    // And so does the offset!!
+    vm.fromOffset = null;
     vm.selectedLogLevel = eventType;
     startTimeRequest();
   };
@@ -729,13 +728,17 @@ function LogViewerController ($scope, $window, LogViewerStore, myLogsApi, LOGVIE
     }
   });
 
+  // #START_POINT. This gets executed first to get the logs metadata if we have a run context.
+  // Otherwise we just fetch the logs based on what context we have.
   if (vm.runId) {
     // Get Initial Status
     fetchLogsMetadata();
   } else {
     vm.loading = false;
-    vm.startTimeMs = vm.startTime;
-    vm.fromOffset = -10000 + '.' + vm.startTimeMs;
+    if (vm.startTime) {
+      vm.startTimeMs = vm.startTime;
+      vm.fromOffset = -10000 + '.' + vm.startTimeMs;
+    }
     startTimeRequest();
   }
 
