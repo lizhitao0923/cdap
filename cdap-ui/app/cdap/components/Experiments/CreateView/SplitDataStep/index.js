@@ -32,15 +32,9 @@ const PREFIX = 'features.Experiments.CreateView';
 require('./SplitDataStep.scss');
 const getSplitLogsUrl = (experimentId, splitInfo) => {
   let splitId = splitInfo.id;
-  let {routerServerUrl, routerServerPort} = window.CDAP_CONFIG.cdap;
-  let protocol = window.CDAP_CONFIG.sslEnabled ? 'https' : 'http';
-  if (routerServerUrl === '127.0.0.1') {
-    routerServerUrl = 'localhost';
-  }
-  let hostPort = `${protocol}://${routerServerUrl}:${routerServerPort}`;
-  let baseUrl = `/v3/namespaces/${getCurrentNamespace()}/apps/ModelManagementApp/spark/ModelManagerService/logs`;
-  let queryParams = encodeURI(`?filter=MDC:experiment="${experimentId}" AND MDC:split=${splitId}`);
-  return `${hostPort}${baseUrl}${queryParams}`;
+  let baseUrl = `/logviewer/view?namespace=${getCurrentNamespace()}&appId=ModelManagementApp&programType=spark&programId=ModelManagerService`;
+  let queryParams = `&filter=${encodeURIComponent(`MDC:experiment="${experimentId}" AND MDC:split=${splitId}`)}`;
+  return `${baseUrl}${queryParams}`;
 };
 
 const getSplitFailedElem = (experimentId, splitInfo) => {
@@ -68,10 +62,9 @@ class SplitDataStep extends Component {
 
   componentWillReceiveProps(nextProps) {
     const isValidSplitStatus = this.props.splitInfo.status;
-    const wasSplitting = ['CREATING', 'Splitting'].indexOf(this.props.splitInfo.status) !== -1;
     const isCurrentSplitStatusFailed = nextProps.splitInfo.status === 'Failed';
 
-    if (isValidSplitStatus && wasSplitting && isCurrentSplitStatusFailed) {
+    if (isValidSplitStatus && isCurrentSplitStatusFailed) {
       this.setState({
         splitFailed: true
       });
