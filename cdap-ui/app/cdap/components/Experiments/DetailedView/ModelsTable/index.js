@@ -207,7 +207,7 @@ const constructModelTrainingLogs = (model, experimentId) => {
   let splitId = objectQuery(model, 'splitDetails', 'id');
   let nowInSeconds = Math.floor(Date.now() / 1000);
   let startTime = Math.floor(model.createtime / 1000);
-  let endTime = Math.floor(model.trainedtime / 1000) || nowInSeconds;
+  let endTime = Math.floor(model.trainedtime / 1000);
   if (splitId) {
     let baseUrl = `/logviewer/view?namespace=${getCurrentNamespace()}&appId=ModelManagementApp&programType=spark&programId=ModelManagerService`;
     let queryParams = `&filter=${encodeURIComponent(`MDC:experiment="${experimentId}" AND MDC:model=${model.id}`)}&startTime=${startTime}&endTime=${endTime}`;

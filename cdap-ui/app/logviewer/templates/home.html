@@ -34,7 +34,7 @@
           <span>{{ Home.appId }}</span>
         </span>
 
-        <span>
+        <span ng-if="Home.status">
           <strong>Status: </strong>
           <span>{{ Home.status }}</span>
         </span>
@@ -47,8 +47,8 @@
 
         <span>
           <strong>End Time: </strong>
-          <span ng-if="Home.endTime">{{ Home.endTime * 1000 | amDateFormat: 'MM/DD/YY h:mm:ss a'}}</span>
-          <span ng-if="!Home.endTime">--</span>
+          <span ng-if="Home.endTime && Home.endTime !== '-1'">{{ Home.endTime * 1000 | amDateFormat: 'MM/DD/YY h:mm:ss a'}}</span>
+          <span ng-if="!Home.endTime || Home.endTime === '-1'">--</span>
         </span>
       </div>
     </div>
