@@ -204,6 +204,8 @@
     </description>
   </property>
 
+  <!-- Bind to 127.0.0.1 (localhost) to protect from xss vulnerabilities while running in sandbox.
+  This must be changed if access to router is needed from a machine other than local machine. See CDAP-14102 -->
   <property>
     <name>router.bind.address</name>
     <value>127.0.0.1</value>
@@ -268,8 +270,9 @@
     </description>
   </property>
 
-  <!-- Override default 0.0.0.0 to 127.0.0.1 (localhost) for all http services
-  to protect from xss vulnerabilities while running in sandbox -->
+  <!-- Override default 0.0.0.0 to 127.0.0.1 (localhost) to protect from xss vulnerabilities while
+  running in sandbox. These must be changed if access is needed from a machine other than local machine.
+  See CDAP-14102 -->
   <property>
     <name>dashboard.bind.address</name>
     <value>127.0.0.1</value>
@@ -279,66 +282,10 @@
   </property>
 
   <property>
-    <name>master.services.bind.address</name>
-    <value>127.0.0.1</value>
-    <description>
-      Bind address for app fabric service and dataset service
-    </description>
-  </property>
-
-  <property>
-    <name>data.tx.bind.address</name>
-    <value>127.0.0.1</value>
-    <description>
-      Transaction service bind address
-    </description>
-  </property>
-
-  <property>
-    <name>log.saver.status.bind.address</name>
-    <value>127.0.0.1</value>
-    <description>
-      Log saver HTTP service bind address
-    </description>
-  </property>
-
-  <property>
-    <name>metadata.service.bind.address</name>
-    <value>127.0.0.1</value>
-    <description>
-      Metadata HTTP service bind address
-    </description>
-  </property>
-
-  <property>
-    <name>metrics.processor.status.bind.address</name>
-    <value>127.0.0.1</value>
-    <description>
-      Metrics processor HTTP service bind address
-    </description>
-  </property>
-
-  <property>
-    <name>remote.system.op.service.bind.address</name>
-    <value>127.0.0.1</value>
-    <description>
-      Remote system operation HTTP service bind address
-    </description>
-  </property>
-
-  <property>
     <name>security.auth.server.bind.address</name>
     <value>127.0.0.1</value>
     <description>
       CDAP Authentication service bind address
-    </description>
-  </property>
-
-  <property>
-    <name>stream.bind.address</name>
-    <value>127.0.0.1</value>
-    <description>
-      Stream HTTP service bind address
     </description>
   </property>
 
