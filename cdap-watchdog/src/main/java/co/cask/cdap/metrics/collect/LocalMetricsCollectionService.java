@@ -88,11 +88,18 @@ public final class LocalMetricsCollectionService extends AggregatedMetricsCollec
 
     // It will only do cleanup if the underlying table doesn't supports TTL.
     scheduler = Executors.newSingleThreadScheduledExecutor(Threads.createDaemonThreadFactory("metrics-cleanup"));
-    long retentionSecs = cConf.getLong(Constants.Metrics.RETENTION_SECONDS + ".1.seconds",
-                                       TimeUnit.HOURS.toSeconds(Constants.Metrics.DEFAULT_RETENTION_HOURS));
+    long secRetentionSecs = cConf.getLong(Constants.Metrics.RETENTION_SECONDS + Constants.Metrics.SECOND_RESOLUTION +
+                                            Constants.Metrics.RETENTION_SECONDS_SUFFIX,
+                                          TimeUnit.HOURS.toSeconds(Constants.Metrics.DEFAULT_SECOND_RETENTION_HOURS));
+    long minRetentionSecs = cConf.getLong(Constants.Metrics.RETENTION_SECONDS + Constants.Metrics.MINUTE_RESOLUTION +
+                                            Constants.Metrics.RETENTION_SECONDS_SUFFIX,
+                                          TimeUnit.DAYS.toSeconds(Constants.Metrics.DEFAULT_MIN_HOUR_RETENTION_DAYS));
+    long hourRetentionSecs = cConf.getLong(Constants.Metrics.RETENTION_SECONDS + Constants.Metrics.HOUR_RESOLUTION +
+                                             Constants.Metrics.RETENTION_SECONDS_SUFFIX,
+                                           TimeUnit.DAYS.toSeconds(Constants.Metrics.DEFAULT_MIN_HOUR_RETENTION_DAYS));
 
     // Try right away if there's anything to cleanup, then we'll schedule to do that periodically
-    scheduler.schedule(createCleanupTask(retentionSecs), 1, TimeUnit.SECONDS);
+    scheduler.schedule(createCleanupTask(secRetentionSecs, minRetentionSecs, hourRetentionSecs), 1, TimeUnit.SECONDS);
   }
 
   @Override
@@ -129,18 +136,23 @@ public final class LocalMetricsCollectionService extends AggregatedMetricsCollec
 
   /**
    * Creates a task for cleanup.
-   * @param retention Retention in seconds.
+   *
+   * @param secondRetention Retention in seconds for second resolution table.
+   * @param minRetention Retention in seconds for min resolution table.
+   * @param hourRetention Retention in seconds for hour resolution table.
    */
-  private Runnable createCleanupTask(final long retention) {
+  private Runnable createCleanupTask(long secondRetention, long minRetention, long hourRetention) {
     return new Runnable() {
       @Override
       public void run() {
         // We perform CleanUp only in LocalMetricsCollectionService , where TTL is NOT supported
         // by underlying data store.
         long currentTime = TimeUnit.SECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-        long deleteBefore = currentTime - retention;
         try {
-          metricStore.deleteBefore(deleteBefore);
+          // delete metrics from corresponding metrics resolution table
+          metricStore.deleteBefore(currentTime - secondRetention, Constants.Metrics.SECOND_RESOLUTION);
+          metricStore.deleteBefore(currentTime - minRetention, Constants.Metrics.MINUTE_RESOLUTION);
+          metricStore.deleteBefore(currentTime - hourRetention, Constants.Metrics.HOUR_RESOLUTION);
         } catch (Exception e) {
           throw Throwables.propagate(e);
         }

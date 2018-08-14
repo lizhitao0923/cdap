@@ -53,9 +53,18 @@ public interface MetricStore {
 
   /**
    * Deletes all metric data before given timestamp. Used for applying TTL policy.
+   *
    * @param timestamp time up to which to delete metrics data, in ms since epoch
    */
   void deleteBefore(long timestamp) throws Exception;
+
+  /**
+   * Deletes all metric data in the given resolution table before given timestamp. Used for applying TTL policy.
+   *
+   * @param timestamp time up to which to delete metrics data, in ms since epoch
+   * @param resolution the resolution table, resolution will be in unit seconds
+   */
+  void deleteBefore(long timestamp, int resolution) throws Exception;
 
   /**
    * Deletes all metric data specified by the {@link MetricDeleteQuery}

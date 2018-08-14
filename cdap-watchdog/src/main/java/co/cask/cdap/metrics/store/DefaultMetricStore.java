@@ -331,15 +331,19 @@ public class DefaultMetricStore implements MetricStore {
 
   @Override
   public void deleteBefore(long timestamp) throws Exception {
-    // Delete all data before the timestamp. null for MeasureName indicates match any MeasureName.
     for (int resolution : resolutions) {
-      // NOTE: we do not purge on TTL the "totals" currently, as there might be system components dependent on it
-      if (TOTALS_RESOLUTION == resolution) {
-        continue;
-      }
-      CubeDeleteQuery query = new CubeDeleteQuery(0, timestamp, resolution, Maps.<String, String>newHashMap());
-      cube.get().delete(query);
+      deleteBefore(timestamp, resolution);
     }
+  }
+
+  @Override
+  public void deleteBefore(long timestamp, int resolution) throws Exception {
+    if (TOTALS_RESOLUTION == resolution) {
+      return;
+    }
+    // Delete all data before the timestamp. null for MeasureName indicates match any MeasureName.
+    CubeDeleteQuery query = new CubeDeleteQuery(0, timestamp, resolution, Collections.emptyMap());
+    cube.get().delete(query);
   }
 
   @Override
@@ -350,7 +354,7 @@ public class DefaultMetricStore implements MetricStore {
   @Override
   public void deleteAll() throws Exception {
     // this will delete all aggregates metrics data
-    delete(new MetricDeleteQuery(0, System.currentTimeMillis() / 1000, Maps.<String, String>newHashMap()));
+    delete(new MetricDeleteQuery(0, System.currentTimeMillis() / 1000, Collections.emptyMap()));
     // this will delete all timeseries data
     deleteBefore(System.currentTimeMillis() / 1000);
   }
